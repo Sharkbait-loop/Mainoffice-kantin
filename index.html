@@ -1,432 +1,179 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Canteen</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f5f6fa;
+        }
 
-<title>Smart Canteen System</title>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-<style>
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
 
-:root{
-    --primary:#f08d0c;
-    --success:#16a34a;
-    --danger:#dc2626;
-    --warning:#f59e0b;
-    --bg:#f1f5f9;
-    --card:#ffffff;
-}
+        h2 { color: var(--primary); margin: 10px 0; }
+        
+        /* Dropdown Styling */
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
 
-body{
-    font-family:Segoe UI, sans-serif;
-    background:var(--bg);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+        input:focus { border-color: var(--success); outline: none; }
 
-.kiosk-container{
-    width:95%;
-    max-width:550px;
-    background:var(--card);
-    border-radius:24px;
-    padding:35px;
-    text-align:center;
-    box-shadow:0 15px 40px rgba(0,0,0,0.1);
-}
+        #resultCard {
+            display: none;
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border-left: 6px solid var(--success);
+            animation: fadeIn 0.4s;
+        }
 
-.site-header{
-    background:var(--primary);
-    color:white;
-    padding:20px;
-    border-radius:18px;
-    margin-bottom:25px;
-}
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.icon{
-    font-size:60px;
-    margin-bottom:10px;
-}
+        .label { font-size: 11px; color: #95a5a6; text-transform: uppercase; }
+        .value { font-size: 18px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
 
-h1{
-    font-size:30px;
-}
-
-h2{
-    margin-top:8px;
-    color:#cbd5e1;
-}
-
-.clock{
-    margin-bottom:20px;
-    color:#64748b;
-}
-
-select{
-    width:100%;
-    padding:16px;
-    border-radius:14px;
-    border:2px solid #ddd;
-    font-size:18px;
-    margin-bottom:20px;
-}
-
-input{
-    width:100%;
-    padding:22px;
-    border-radius:18px;
-    border:3px solid #cbd5e1;
-    font-size:28px;
-    text-align:center;
-    font-weight:bold;
-    outline:none;
-}
-
-input:focus{
-    border-color:var(--primary);
-}
-
-.loader{
-    margin:25px auto;
-    border:5px solid #eee;
-    border-top:5px solid var(--primary);
-    border-radius:50%;
-    width:45px;
-    height:45px;
-    animation:spin 1s linear infinite;
-    display:none;
-}
-
-@keyframes spin{
-    100%{
-        transform:rotate(360deg);
-    }
-}
-
-.status-card{
-    display:none;
-    margin-top:25px;
-    padding:25px;
-    border-radius:18px;
-}
-
-.success{
-    background:#dcfce7;
-    border-left:8px solid var(--success);
-}
-
-.error{
-    background:#fee2e2;
-    border-left:8px solid var(--danger);
-}
-
-.warning{
-    background:#fef3c7;
-    border-left:8px solid var(--warning);
-}
-
-.status-title{
-    font-size:28px;
-    font-weight:bold;
-    margin-bottom:10px;
-}
-
-.status-name{
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:10px;
-}
-
-.footer{
-    margin-top:25px;
-    color:#94a3b8;
-    font-size:14px;
-}
-
-</style>
+        .loading-spinner {
+            display: none;
+            margin: 15px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--success);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-
 <body>
 
-<div class="kiosk-container">
+<audio id="beepSuccess" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-    <div class="site-header">
-        <div class="icon">🍱</div>
-        <h1>ABSENSI KATERING</h1>
-        <h2>PT UNITEDTRACTORS SITE BKJ</h2>
+<div class="container">
+    <div style="font-size: 40px;">🍱</div>
+    <h2>Absensi Kantin</h2>
+    
+    <select id="kategoriMakan">
+        <option value="Makan Pagi">☀️ Makan Pagi</option>
+        <option value="Makan Siang" selected>🍴 Makan Siang</option>
+        <option value="Makan Malam">🌙 Makan Malam</option>
+    </select>
+
+    <input type="text" id="nrpInput" placeholder="Masukkan NRP" autofocus autocomplete="off">
+
+    <div id="loader" class="loading-spinner"></div>
+
+    <div id="resultCard">
+        <div class="label">Nama</div>
+        <div id="resNama" class="value">-</div>
+        <div class="label">Departemen</div>
+        <div id="resDept" class="value">-</div>
+        <div style="color: var(--success); font-weight: bold;">✅ Berhasil Dicatat</div>
     </div>
 
-    <div class="clock" id="clock"></div>
-
-    <!-- PILIH SITE -->
-
-<select id="site">
-
-    <option value="main_office">
-        Main Office
-    </option>
-
-    <option value="service_sims">
-        Service SIMS
-    </option>
-
-    <option value="service_biu1">
-        Service BIU 1
-    </option>
-
-    <option value="sparepartbiu_1">
-        SparePart BIU 1
-    </option>
-
-</select>
-
-<select id="kategori">
-
-    <option>Makan Pagi</option>
-
-    <option selected>Makan Siang</option>
-
-    <option>Makan Malam</option>
-
-</select>
-
-    <input 
-        type="text"
-        id="barcodeInput"
-        placeholder="SCAN BARCODE"
-        autofocus
-        autocomplete="off"
-    >
-
-    <div class="loader" id="loader"></div>
-
-    <!-- SUCCESS -->
-    <div class="status-card success" id="successCard">
-
-        <div class="status-title">
-            ✅ BERHASIL
-        </div>
-
-        <div class="status-name" id="successName">
-            -
-        </div>
-
-        <div id="successDept">
-            -
-        </div>
-
+    <div id="errMsg" style="display:none; color: var(--error); margin-top: 15px; font-weight: bold;">
+        ❌ NRP Tidak Terdaftar!
     </div>
-
-    <!-- ERROR -->
-    <div class="status-card error" id="errorCard">
-
-        <div class="status-title">
-            ❌ NRP TIDAK DITEMUKAN
-        </div>
-
-    </div>
-
-    <!-- WARNING -->
-    <div class="status-card warning" id="warningCard">
-
-        <div class="status-title">
-            ⚠ SALAH SITE
-        </div>
-
-    </div>
-
-    <div class="footer">
-        Smart Industrial Canteen System v1.0
-    </div>
-
 </div>
 
 <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwcg6YBMTUGiWW4xfa2lo_JOmKnsKewIpQvFrcODRVv5IQzmIMX1eGviYqHdOXkGOaN/exec";
+    const PANJANG_NRP = 8; // Sesuaikan dengan jumlah digit NRP Anda (8215831 = 7 digit)
 
-/* =====================================
-   CONFIG
-===================================== */
+    const nrpInput = document.getElementById('nrpInput');
+    const kategoriSelect = document.getElementById('kategoriMakan');
+    const resultCard = document.getElementById('resultCard');
+    const loader = document.getElementById('loader');
+    const beep = document.getElementById('beepSuccess');
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwuIjcgN7wIzroacg56KyHomI86UUX8whBf_x6ISCpouwy3dOWtVgw2_0sHQivy35Hq/exec";
+    nrpInput.addEventListener('input', () => {
+        if (nrpInput.value.length === PANJANG_NRP) {
+            submitAbsen(nrpInput.value);
+        }
+    });
 
-const PANJANG_BARCODE = 8;
+    async function submitAbsen(nrp) {
+        const kategori = kategoriSelect.value;
+        loader.style.display = 'block';
+        nrpInput.disabled = true;
+        resultCard.style.display = 'none';
+        document.getElementById('errMsg').style.display = 'none';
 
-/* =====================================
-   ELEMENT
-===================================== */
+        try {
+            const response = await fetch(`${WEB_APP_URL}?nrp=${nrp}&kategori=${kategori}`);
+            const data = await response.json();
 
-const barcodeInput = document.getElementById("barcodeInput");
+            loader.style.display = 'none';
 
-const loader = document.getElementById("loader");
-
-const successCard = document.getElementById("successCard");
-
-const errorCard = document.getElementById("errorCard");
-
-const warningCard = document.getElementById("warningCard");
-
-/* =====================================
-   CLOCK
-===================================== */
-
-function updateClock(){
-
-    const now = new Date();
-
-    document.getElementById("clock").innerHTML =
-        now.toLocaleDateString("id-ID") +
-        " | " +
-        now.toLocaleTimeString("id-ID");
-
-}
-
-setInterval(updateClock,1000);
-
-updateClock();
-
-/* =====================================
-   INPUT LISTENER
-===================================== */
-
-barcodeInput.addEventListener("input", ()=>{
-
-    const value = barcodeInput.value
-        .replace(/\s/g,'')
-        .replace(/[^0-9]/g,'');
-
-    if(value.length === PANJANG_BARCODE){
-
-        submitBarcode(value);
-
+            if (data && data.status === "success") {
+                beep.play(); // Bunyi Beep
+                document.getElementById('resNama').innerText = data.nama;
+                document.getElementById('resDept').innerText = data.dept;
+                resultCard.style.display = 'block';
+                setTimeout(resetForm, 3000);
+            } else {
+                document.getElementById('errMsg').style.display = 'block';
+                setTimeout(resetForm, 2000);
+            }
+        } catch (e) {
+            loader.style.display = 'none';
+            alert("Koneksi bermasalah!");
+            resetForm();
+        }
     }
 
-});
-
-/* =====================================
-   SUBMIT BARCODE
-===================================== */
-
-let isSubmitting = false;
-
-async function submitBarcode(barcode){
-
-    if(isSubmitting) return;
-
-    isSubmitting = true;
-
-    hideAllCards();
-
-    loader.style.display = "block";
-
-    barcodeInput.disabled = true;
-
-    try{
-
-        const kategori = document
-            .getElementById("kategori")
-            .value;
-
-        const site =
-    document.getElementById("site").value;
-
-        const response = await fetch(
-            `${WEB_APP_URL}?nrp=${barcode}&site=${site}&kategori=${encodeURIComponent(kategori)}`
-        );
-
-        const data = await response.json();
-
-        loader.style.display = "none";
-
-        console.log(data);
-
-       if(data.status === "success"){
-
-    showSuccess(data.nama, data.dept);
-
-    }else if(data.status === "wrong_site"){
-    
-        showWarning();
-    
-    }else{
-    
-        showError();
-    
+    function resetForm() {
+        nrpInput.disabled = false;
+        nrpInput.value = '';
+        nrpInput.focus();
+        resultCard.style.display = 'none';
+        document.getElementById('errMsg').style.display = 'none';
     }
-    }catch(error){
-
-        console.log(error);
-
-        loader.style.display = "none";
-
-        showError();
-
-    }
-
-    setTimeout(resetForm,2500);
-
-}
-
-/* =====================================
-   CARD CONTROL
-===================================== */
-
-function hideAllCards(){
-
-    successCard.style.display = "none";
-
-    errorCard.style.display = "none";
-
-    warningCard.style.display = "none";
-
-}
-
-function showSuccess(nama, dept){
-
-    document.getElementById("successName").innerText = nama;
-
-    document.getElementById("successDept").innerText = dept;
-
-    successCard.style.display = "block";
-
-}
-
-function showError(){
-
-    errorCard.style.display = "block";
-
-}
-
-function showWarning(){
-
-    warningCard.style.display = "block";
-
-}
-
-/* =====================================
-   RESET
-===================================== */
-
-function resetForm(){
-
-    barcodeInput.disabled = false;
-
-    barcodeInput.value = "";
-
-    barcodeInput.focus();
-
-    hideAllCards();
-
-    isSubmitting = false;
-
-}
-
 </script>
 
 </body>
